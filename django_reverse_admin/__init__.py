@@ -1,4 +1,5 @@
 #pylint: skip-file
+from django import VERSION
 from django.contrib.admin import helpers, ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.admin.utils import flatten_fieldsets
@@ -141,7 +142,10 @@ class ReverseModelAdmin(ModelAdmin):
             field = model._meta.get_field(field_name)
             if isinstance(field, (OneToOneField, ForeignKey)):
                 name = field.name
-                parent = field.remote_field.model
+                if VERSION < (1, 10):
+                    parent = field.rel.model
+                else:
+                    parent = field.remote_field.model
                 inline = ReverseInlineModelAdmin(model,
                                                  name,
                                                  parent,
